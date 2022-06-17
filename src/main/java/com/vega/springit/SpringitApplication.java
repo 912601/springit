@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.ocpsoft.prettytime.PrettyTime;
 
 @SpringBootApplication
-@EnableJpaAuditing
 public class SpringitApplication {
 
     private static final Logger log = LoggerFactory.getLogger(SpringitApplication.class);
