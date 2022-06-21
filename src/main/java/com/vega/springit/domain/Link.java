@@ -22,7 +22,6 @@ import org.ocpsoft.prettytime.PrettyTime;
 @Entity
 @RequiredArgsConstructor
 @Getter @Setter
-@ToString
 @NoArgsConstructor
 public class Link extends Auditable {
 
