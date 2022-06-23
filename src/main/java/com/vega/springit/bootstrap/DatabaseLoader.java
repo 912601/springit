@@ -1,9 +1,9 @@
 package com.vega.springit.bootstrap;
 
+import com.vega.springit.domain.AppUser;
 import com.vega.springit.domain.Comment;
 import com.vega.springit.domain.Link;
 import com.vega.springit.domain.Role;
-import com.vega.springit.domain.AppUser;
 import com.vega.springit.repository.CommentRepository;
 import com.vega.springit.repository.LinkRepository;
 import com.vega.springit.repository.RoleRepository;
@@ -22,10 +22,10 @@ public class DatabaseLoader implements CommandLineRunner {
 
     private LinkRepository linkRepository;
     private CommentRepository commentRepository;
-
     private UserRepository userRepository;
-
     private RoleRepository roleRepository;
+
+    private Map<String,AppUser> users = new HashMap<>();
 
     public DatabaseLoader(LinkRepository linkRepository, CommentRepository commentRepository, UserRepository userRepository, RoleRepository roleRepository) {
         this.linkRepository = linkRepository;
@@ -36,9 +36,10 @@ public class DatabaseLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        
+
+        // add users and roles
         addUsersAndRoles();
-        
+
         Map<String,String> links = new HashMap<>();
         links.put("Securing Spring Boot APIs and SPAs with OAuth 2.0","https://auth0.com/blog/securing-spring-boot-apis-and-spas-with-oauth2/?utm_source=reddit&utm_medium=sc&utm_campaign=springboot_spa_securing");
         links.put("Easy way to detect Device in Java Web Application using Spring Mobile - Source code to download from GitHub","https://www.opencodez.com/java/device-detection-using-spring-mobile.htm");
@@ -53,7 +54,15 @@ public class DatabaseLoader implements CommandLineRunner {
         links.put("File download example using Spring REST Controller","https://www.jeejava.com/file-download-example-using-spring-rest-controller/");
 
         links.forEach((k,v) -> {
-            Link link = new Link(k, v);
+            AppUser u1 = users.get("user@gmail.com");
+            AppUser u2 = users.get("super@gmail.com");
+            Link link = new Link(k,v);
+            if(k.startsWith("Build")) {
+                link.setUser(u1);
+            } else {
+                link.setUser(u2);
+            }
+
             linkRepository.save(link);
 
             // we will do something with comments later
@@ -72,7 +81,6 @@ public class DatabaseLoader implements CommandLineRunner {
     }
 
     private void addUsersAndRoles() {
-
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String secret = "{bcrypt}" + encoder.encode("password");
 
@@ -81,19 +89,24 @@ public class DatabaseLoader implements CommandLineRunner {
         Role adminRole = new Role("ROLE_ADMIN");
         roleRepository.save(adminRole);
 
-        AppUser user = new AppUser("user@gmail.com",secret,true);
+        AppUser user = new AppUser("user@gmail.com",secret,true,"Joe","User","joedirt");
         user.addRole(userRole);
+        user.setConfirmPassword(secret);
         userRepository.save(user);
+        users.put("user@gmail.com",user);
 
-        AppUser admin = new AppUser("admin@gmail.com",secret,true);
+        AppUser admin = new AppUser("admin@gmail.com",secret,true,"Joe","Admin","masteradmin");
+        admin.setAlias("joeadmin");
         admin.addRole(adminRole);
+        admin.setConfirmPassword(secret);
         userRepository.save(admin);
+        users.put("admin@gmail.com",admin);
 
-        AppUser master = new AppUser("master@gmail.com",secret,true);
+        AppUser master = new AppUser("super@gmail.com",secret,true,"Super","User","superduper");
         master.addRoles(new HashSet<>(Arrays.asList(userRole,adminRole)));
+        master.setConfirmPassword(secret);
         userRepository.save(master);
-
+        users.put("super@gmail.com",master);
     }
-
 
 }

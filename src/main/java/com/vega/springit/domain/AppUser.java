@@ -1,11 +1,13 @@
 package com.vega.springit.domain;
 
+import com.vega.springit.domain.validator.PasswordsMatch;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @ToString
 @NoArgsConstructor
+@PasswordsMatch
 public class AppUser implements UserDetails {
 
     @Id
@@ -42,6 +45,34 @@ public class AppUser implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @NonNull
+    @NotEmpty(message = "You must enter First Name.")
+    private String firstName;
+
+    @NonNull
+    @NotEmpty(message = "You must enter Last Name.")
+    private String lastName;
+
+    @Transient
+    @Setter(AccessLevel.NONE)
+    private String fullName;
+
+    @NonNull
+    @NotEmpty(message = "Please enter alias.")
+    @Column(nullable = false, unique = true)
+    private String alias;
+
+    @Transient
+    @NotEmpty(message = "Please enter Password Confirmation")
+    private String confirmPassword;
+
+    private String activationCode;
+
+
+    public String getFullName(){
+        return firstName + " " + lastName;
+    }
 
     public void addRole(Role role) {
         roles.add(role);

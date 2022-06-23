@@ -3,10 +3,7 @@ package com.vega.springit.domain;
 import com.vega.springit.service.BeanUtil;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,6 +42,9 @@ public class Link extends Auditable {
     private List<Vote> votes = new ArrayList<>();
 
     private int voteCount = 0;
+
+    @ManyToOne
+    private AppUser user;
 
 
 
